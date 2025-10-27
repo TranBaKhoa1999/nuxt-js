@@ -1,0 +1,13 @@
+{
+  // "files.autoSave": "afterDelay",
+  // "editor.formatOnSave": false,
+  // "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // "[json]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  // "[jsonc]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  // "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  // "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  // "[prisma]": { "editor.defaultFormatter": "Prisma.prisma" },
+  // "files.exclude": { "**/node_modules": true },
+  // "javascript.updateImportsOnFileMove.enabled": "always",
+  "workbench.activityBar.orientation": "vertical"
+}

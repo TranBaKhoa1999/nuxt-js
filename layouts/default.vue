@@ -7,7 +7,7 @@
             <NavBar />
         </div>
 
-        <div class="min-h-screen flex items-center justify-center bg-gray-50" id="container">
+        <div class="min-h-screen flex items-center justify-center bg-gray-200 dark:bg-gray-800" id="container">
             <slot />
         </div>
 

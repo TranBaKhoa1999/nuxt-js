@@ -111,7 +111,4 @@
 </script>
 
 <style lang="css" scoped>
-*{
-    color:white;
-}
 </style>

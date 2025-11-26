@@ -1,6 +1,6 @@
 <template>
     <div>
-        Product detial for {{ id}}
+        Product detial for {{ id }}
     </div>
 </template>
 
@@ -11,7 +11,7 @@
 //     layout:'custom'
 // })
 definePageMeta({
-    layout:'custom'
+    layout: 'custom'
 })
 const route = useRoute();
 const id = route.params.id;

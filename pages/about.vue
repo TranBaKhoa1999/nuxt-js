@@ -9,10 +9,10 @@
 
 <script setup>
 useHead({
-    'title':'About Page',
+    'title': 'About Page',
     'meta': {
-        name:'description',
-        content:'this is about page'
+        name: 'description',
+        content: 'this is about page'
     }
 })
 </script>

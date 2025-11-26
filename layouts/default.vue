@@ -1,6 +1,5 @@
 <template>
-    <div
-        class="bg-gray-50 dark:bg-gray-900">
+    <div class="bg-gray-50 dark:bg-gray-900">
 
         <div class="header">
             <Header />
@@ -18,5 +17,4 @@
 <script setup>
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

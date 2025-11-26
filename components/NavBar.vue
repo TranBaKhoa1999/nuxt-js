@@ -9,10 +9,25 @@
                 </NuxtLink>
 
                 <div class="flex md:order-2 items-center space-x-3 md:space-x-0 rtl:space-x-reverse">
-                    <NuxtLink to="/login"
-                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                        Login
-                    </NuxtLink>
+                    <template v-if="!isAuthenticated">
+                        <NuxtLink to="/login"
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            Login
+                        </NuxtLink>
+                        <NuxtLink to="/register"
+                            class="text-sm font-medium px-4 py-2 rounded-lg text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-300 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-400 dark:hover:text-gray-900">
+                            Register
+                        </NuxtLink>
+                    </template>
+                    <template v-else>
+                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-200 mr-2">
+                            Hi, {{ authUser?.name || 'User' }}
+                        </span>
+                        <button @click="handleLogout" :disabled="authLoading"
+                            class="text-sm font-medium px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 disabled:opacity-60 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800">
+                            {{ authLoading ? 'Signing out...' : 'Logout' }}
+                        </button>
+                    </template>
 
                     <!-- Dark Mode Toggle -->
                     <button @click="toggleDark"
@@ -53,11 +68,16 @@
     </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted, computed } from 'vue'
 
 const route = useRoute();
-const isActive = (path) => route.path === path
+const { user, logout, loading: authLoadingState } = useAuth({ redirectOnLogout: '/login' })
+
+const authUser = computed(() => user.value)
+const authLoading = computed(() => authLoadingState.value)
+const isAuthenticated = computed(() => Boolean(authUser.value))
+const isActive = (path: string) => route.path === path
 const isDark = ref(false)
 
 const toggleDark = () => {
@@ -68,6 +88,14 @@ const toggleDark = () => {
     } else {
         document.documentElement.classList.remove('dark')
         localStorage.setItem('theme', 'light')
+    }
+}
+
+const handleLogout = async () => {
+    try {
+        await logout()
+    } catch (error) {
+        console.error('Logout failed', error)
     }
 }
 

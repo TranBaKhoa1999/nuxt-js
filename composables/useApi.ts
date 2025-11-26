@@ -1,46 +1,38 @@
-// composables/useApi.ts (Nuxt 3 automatically recognizes composables)
+// composables/useApi.ts
 import { useRuntimeConfig } from '#imports'
 
-export const useApi = () => {
+export const useApi = (usePrefix: boolean = true) => {
     const config = useRuntimeConfig()
-
     const apiBase = config.public.apiBaseUrl;
     const apiPrefix = config.public.apiPrefix;
 
-    // function to call API, automatically add /api, handle token, error...
     const apiFetch = async <T>(
         endpoint: string,
         options: RequestInit = {}
     ): Promise<T> => {
-        const token = useCookie('XSRF-TOKEN')?.value || '' // Sanctum uses XSRF + laravel_session
-        // or if you use bearer token (JWT/Passport)
-        // const token = useCookie('auth_token')?.value
+        const xsrfToken = useCookie('XSRF-TOKEN', { readonly: true }).value // Sanctum uses XSRF + laravel_session
 
         const headers: HeadersInit = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
-            // Sanctum needs 2 of these for csrf protection
-            'X-XSRF-TOKEN': token,
-            // if you use referrer same domain then no need
-            // Referer: apiBase,
+            ...(xsrfToken ? { 'X-XSRF-TOKEN': xsrfToken } : {}),
             ...options.headers,
         }
 
-        // if you use Bearer token (Passport or Sanctum spa)
-        // if (token) headers.Authorization = `Bearer ${token}`
+        const url = usePrefix
+            ? `${apiBase}/${apiPrefix}/${endpoint}`
+            : `${apiBase}/${endpoint}`
 
-        const url = `${apiBase}/${apiPrefix}/${endpoint}`;
-        console.log(url);
         const response = await fetch(url, {
-            credentials: 'include', // IMPORTANT: to send cookie (laravel_session + XSRF-TOKEN)
             ...options,
             headers,
+            credentials: 'include',
         })
 
         if (!response.ok) {
-            const error = await response.json().catch(() => ({}))
-            throw new Error(error.message || `HTTP ${response.status}`)
+            const err = await response.json().catch(() => ({}))
+            throw new Error(err.message || `HTTP ${response.status}`)
         }
 
         return response.json()

@@ -1,0 +1,103 @@
+---
+alwaysApply: true
+---
+
+# Coding Rules for this Project
+
+## 1. Comments Language
+
+- Always comment code in English
+- All function documentation, inline comments, and explanations must be in English
+- Example: Use "Save page and limit in state" not "Lưu page và limit trong state"
+
+## 2. Folder Structure (Reference Product Pattern)
+
+### Types
+
+- All TypeScript interfaces and types go in `types/` folder
+- One file per domain: `types/Product.ts`, `types/Category.ts`, `types/api.ts`
+- Export interfaces and response types from types folder
+- Import shared types from `types/api.ts` when needed
+
+### Composables
+
+- All reusable logic in `composables/` folder
+- Naming: `use{Feature}.ts` (e.g., `useProducts.ts`, `useCategories.ts`)
+- Import types from `types/` folder, not define inline
+- Use `useGlobalCache` for caching
+- Use `useApi` for API calls
+
+### Components
+
+- Vue components in `components/` folder
+- Use PascalCase naming (e.g., `ProductCard.vue`)
+- Import composables and types as needed
+
+### Pages
+
+- Follow Nuxt 3 file-based routing
+- Dynamic routes: `[param].vue`
+- Nested routes: `[parent]/[child].vue`
+- Example: `pages/products/[category]/[slug].vue`
+
+### Pattern Example (Product):
+
+```
+types/Product.ts → Product interface, ProductsResponse type
+composables/useProducts.ts → useProducts composable (imports from types/)
+components/ProductCard.vue → Uses useProducts composable
+pages/products/index.vue → Uses useProducts composable
+```
+
+## 3. Clean Code
+
+### General Principles
+
+- Single Responsibility: Each function/component does one thing
+- DRY: Extract reusable logic to composables
+- Meaningful Names: Use descriptive variable and function names
+- Small Functions: Keep functions small and focused
+
+### TypeScript
+
+- Always define types/interfaces for data structures
+- Use `interface` for objects, `type` for unions/intersections
+- Export types from `types/` folder, not inline
+- Avoid `any` type
+
+### Vue/Nuxt
+
+- Use `<script setup lang="ts">` for components
+- Use composables for reusable logic
+- Use `computed` for derived state
+- Use `watch` for side effects
+- Prefer `useState` over local refs for shared state
+
+### Code Organization
+
+1. Imports (external first, then internal)
+2. Interfaces (if local, otherwise import from types/)
+3. Main function/component
+4. Setup (route, router, composables)
+5. State/Computed
+6. Functions
+7. Return
+
+### Comments
+
+- Comment complex logic, not obvious code
+- Explain "why" not "what"
+- All comments in English
+
+### Add ';' of end line
+
+## When Writing Code:
+
+- ✅ Put types in `types/` folder
+- ✅ Put composables in `composables/` folder
+- ✅ Comment in English
+- ✅ Follow Product pattern structure
+- ✅ Keep code clean and organized
+- ❌ Don't define types inline in composables
+- ❌ Don't use Vietnamese comments
+- ❌ Don't duplicate code

@@ -1,4 +1,4 @@
-// composables/useApi.ts  (Nuxt 3 tự động nhận composables)
+// composables/useApi.ts (Nuxt 3 automatically recognizes composables)
 import { useRuntimeConfig } from '#imports'
 
 export const useApi = () => {

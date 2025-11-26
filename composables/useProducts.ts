@@ -1,99 +1,174 @@
-import { computed } from 'vue'
-import type { ProductsResponse } from '~/types/Product'
+// composables/useProducts.ts
+import { computed, watch } from 'vue'
+import type { ProductsResponse } from '~/types/product'
+import { useGlobalCache } from './useCache'
 
 interface UseProductsOptions {
     page?: number
     limit?: number
+    ttl?: number
 }
 
-// Cache store để lưu data theo key - dùng useState để persistent
-const getCacheStore = () => useState<Map<string, ProductsResponse>>('products-cache', () => new Map())
-
 export const useProducts = async (options: UseProductsOptions = {}) => {
-    const route = useRoute()
-    const router = useRouter()
-    const { apiFetch } = useApi()
+    const { page: optPage, limit: optLimit, ttl = 1000 * 60 * 30 } = options
 
-    //setup page and limit
-    const page = computed(() => {
-        const pageParam = route.query.page ?? options.page ?? 1
-        const parsed = Number(pageParam)
-        return Number.isNaN(parsed) || parsed < 1 ? 1 : parsed
+    const route = useRoute();
+    const router = useRouter();
+    const { apiFetch } = useApi();
+    const { set, read } = useGlobalCache();
+
+    // Save page and limit in state (not displayed in URL)
+    // Read from query params on first load (to support share URL), then use state
+    const initialPage = (() => {
+        const val = route.query.page ?? optPage ?? 1
+        const n = Number(val)
+        return Number.isNaN(n) || n < 1 ? 1 : n;
+    })()
+
+    const initialLimit = (() => {
+        if (optLimit !== undefined) return optLimit > 0 ? optLimit : 5;
+        const val = route.query.limit
+        if (!val) return 5;
+        const n = Number(val);
+        return Number.isNaN(n) || n < 1 ? 5 : n;
+    })()
+
+    // State to store page and limit (not displayed in URL)
+    const pageState = useState('products-page', () => initialPage)
+    const limitState = useState('products-limit', () => initialLimit)
+    const lastCategoryState = useState('products-last-category', () => undefined as string | undefined)
+
+    // Reactive page & limit from state
+    const page = computed({
+        get: () => pageState.value,
+        set: (val) => { pageState.value = val }
     })
 
-    const limit = computed(() => {
-        const limitParam = route.query.limit ?? options.limit
-        if (!limitParam) return undefined
-        const parsed = Number(limitParam)
-        return Number.isNaN(parsed) || parsed < 1 ? undefined : parsed
+    const limit = computed({
+        get: () => limitState.value,
+        set: (val) => { limitState.value = val }
     })
 
-    //create key unique theo page và limit để cache đúng
-    const getDataKey = () => `products-${page.value}-${limit.value ?? 'default'}`
+    const category = computed(() => {
+        // Read from route params (products/[category]) or query (products?category=...)
+        const paramCategory = route.params.category
+        const queryCategory = route.query.category
 
-    const cacheStore = getCacheStore()
+        if (typeof paramCategory === 'string' && paramCategory) {
+            return paramCategory
+        }
+        if (typeof queryCategory === 'string' && queryCategory) {
+            return queryCategory
+        }
+        return undefined
+    })
 
-    //fetcher function
-    const fetcher = async () => {
+    // Watch category to reset page to 1 when category changes
+    watch(category, (newCategory, oldCategory) => {
+        if (newCategory !== oldCategory) {
+            pageState.value = 1
+            lastCategoryState.value = newCategory
+        }
+    }, { immediate: true })
+
+    // Unique cache key (includes category)
+    const cacheKey = computed(() => `products:${page.value}:${limit.value}:${category.value ?? 'all'}`);
+
+    // Fetcher
+    const fetcher = async (): Promise<ProductsResponse> => {
         const params = new URLSearchParams()
         params.set('page', String(page.value))
-        if (limit.value) params.set('limit', String(limit.value))
+        params.set('limit', String(limit.value))
 
-        const response = await apiFetch<ProductsResponse>(`products?${params.toString()}`)
+        // API endpoint: products/{category-slug}?page=1&limit=2 or products?page=1&limit=2
+        const endpoint = category.value
+            ? `products/${category.value}?${params.toString()}`
+            : `products?${params.toString()}`
 
-        //save to cache
-        const key = getDataKey()
-        cacheStore.value.set(key, response)
+        const response = await apiFetch<ProductsResponse>(endpoint)
+
+        // Save to global cache
+        set(cacheKey.value, response, ttl)
 
         return response
     }
 
-    //useAsyncData with cache
-    const asyncData = await useAsyncData(
-        getDataKey,
+    // useAsyncData + use getCachedData to read from global cache
+    const { data, pending, error, refresh } = await useAsyncData(
+        () => cacheKey.value,
         fetcher,
         {
-            watch: [page, limit],
-            lazy: true, // not block navigation, fetch after component mounted
-            default: () => null, // default value when loading
-            // check cache before fetch
-            getCachedData: (key) => {
-                const cached = cacheStore.value.get(key)
-                if (cached) {
-                    console.log(`using cached data for key: ${key}`)
-                    return cached
-                }
-                return undefined
-            },
+            watch: [page, limit, category],
+            lazy: true,
+            default: () => null,
+            dedupe: 'cancel', // Prevent duplicate requests when navigating quickly
+
+            // Read cache from global cache
+            getCachedData: () => read<ProductsResponse>(cacheKey.value, cacheKey.value),
         }
     )
 
-    const products = computed(() => asyncData.data.value?.data?.data ?? [])
-    const meta = computed(() => asyncData.data.value?.data?.meta ?? null)
-    const links = computed(() => asyncData.data.value?.data?.links ?? null)
+    // Helpers
+    const products = computed(() => data.value?.data?.data ?? [])
+    const meta = computed(() => data.value?.data?.meta ?? null)
+    const links = computed(() => data.value?.data?.links ?? null)
 
     const goToPage = (targetPage: number) => {
         if (targetPage === page.value) return
-        router.push({
-            query: { ...route.query, page: targetPage }
-        })
+
+        // Only update state, don't update URL
+        page.value = targetPage
+
+        // Navigate without query params
+        if (category.value) {
+            router.replace({
+                path: `/products/${category.value}`
+            })
+        } else {
+            router.replace({
+                path: '/products'
+            })
+        }
     }
 
-    const updateLimit = (newLimit: number) => {
-        router.push({
-            query: { ...route.query, page: 1, limit: newLimit }
-        })
+    const updateLimit = (newLimit?: number) => {
+        const newLimitValue = newLimit && newLimit > 0 ? newLimit : 5
+
+        // Update both page and limit in state
+        limit.value = newLimitValue
+        page.value = 1 // Reset to page 1
+
+        // Navigate without query params
+        if (category.value) {
+            router.replace({
+                path: `/products/${category.value}`
+            })
+        } else {
+            router.replace({
+                path: '/products'
+            })
+        }
     }
+
 
     return {
-        ...asyncData,
+        // Raw async data
+        data,
+        pending,
+        error,
+        refresh,
+
+        // Parsed data
         products,
         meta,
         links,
+
+        // Current state
         page,
         limit,
+
+        // Actions
         goToPage,
-        updateLimit
+        updateLimit,
     }
 }
-

@@ -2,9 +2,9 @@
     <div>
         Custom Layout
     </div>
-    <Header />
+    <!-- <Header /> -->
     <slot />
-    <Footer />
+    <!-- <Footer /> -->
 </template>
 
 <script setup>

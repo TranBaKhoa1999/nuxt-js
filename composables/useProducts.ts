@@ -52,13 +52,9 @@ export const useProducts = async (options: UseProductsOptions = {}) => {
     const category = computed(() => {
         // Read from route params (products/[category]) or query (products?category=...)
         const paramCategory = route.params.category
-        const queryCategory = route.query.category
 
         if (typeof paramCategory === 'string' && paramCategory) {
             return paramCategory
-        }
-        if (typeof queryCategory === 'string' && queryCategory) {
-            return queryCategory
         }
         return undefined
     })

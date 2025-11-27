@@ -7,16 +7,11 @@ const router = useRouter()
 // Fetch categories using composable
 const { categories, pending: categoriesPending } = await useCategories()
 
-// Read category from params or query
+// Read category from params
 const selectedCategory = computed(() => {
-    const paramCategory = route.params.category
-    const queryCategory = route.query.category
-
+    const paramCategory = route.params.category;
     if (typeof paramCategory === 'string' && paramCategory) {
         return paramCategory
-    }
-    if (typeof queryCategory === 'string' && queryCategory) {
-        return queryCategory
     }
     return undefined
 })

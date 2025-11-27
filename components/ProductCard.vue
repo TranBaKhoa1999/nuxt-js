@@ -15,13 +15,14 @@ const handleImageError = (e: Event) => {
 
 <template>
     <div
-        class="bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow relative">
+        class="bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow relative flex flex-col min-h-[400px]">
         <!-- Product Image -->
-        <div class="relative">
-            <NuxtLink :to="`/products/${props.product.category.slug}/${props.product.slug}`">
-                <img class="rounded-t-lg w-full h-40 object-contain" :src="props.product.image_url"
+        <div class="relative w-full h-40 bg-gray-100 dark:bg-gray-700">
+            <NuxtLink :to="`/products/${props.product.category.slug}/${props.product.slug}`"
+                class="block w-full h-full">
+                <img class="rounded-t-lg w-full h-full object-contain" :src="props.product.image_url"
                     :alt="props.product.name" @error="handleImageError" @mouseenter="isHovering = true"
-                    @mouseleave="isHovering = false" />
+                    @mouseleave="isHovering = false" loading="lazy" />
             </NuxtLink>
             <!-- Product Preview on Hover -->
             <Transition name="fade">
@@ -31,7 +32,7 @@ const handleImageError = (e: Event) => {
             </Transition>
         </div>
 
-        <div class="p-3">
+        <div class="p-3 flex-1 flex flex-col">
             <!-- Category Badge -->
             <div class="mb-1.5">
                 <span
@@ -73,7 +74,7 @@ const handleImageError = (e: Event) => {
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex gap-1.5">
+            <div class="flex gap-1.5 mt-auto">
                 <NuxtLink :to="`/products/${props.product.category.slug}/${props.product.slug}`"
                     class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-2 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 flex-1 justify-center">
                     Chi tiết

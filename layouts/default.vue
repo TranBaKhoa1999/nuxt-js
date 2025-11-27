@@ -6,9 +6,9 @@
             <NavBar />
         </div>
 
-        <div class="min-h-screen flex items-center justify-center bg-gray-200 dark:bg-gray-800" id="container">
+        <main class="min-h-screen bg-gray-200 dark:bg-gray-800 py-8" id="container">
             <slot />
-        </div>
+        </main>
 
         <Footer />
     </div>

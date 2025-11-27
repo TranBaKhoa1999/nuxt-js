@@ -8,3 +8,21 @@
 .dark body *{
     color:white;
 }
+
+/* Prevent layout shift during image loading */
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Smooth transitions for product cards */
+.product-card {
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+/* Optimize grid rendering */
+.grid {
+    contain: layout style paint;
+}

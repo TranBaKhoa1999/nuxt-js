@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { useProducts } from '~/composables/useProducts'
 
-import LoadingState from '~/components/LoadingState.vue'
+const { products, meta, pending, error, goToPage, updateLimit, limit } = await useProducts();
 
-const { products, meta, pending, error, goToPage, updateLimit, limit } = await useProducts()
-
-const limitOptions = [5, 10, 20, 50, 100]
+const limitOptions = [5, 10, 20, 50, 100];
 
 // Limit model cho select
 const limitModel = computed({
     get: () => limit.value,
     set: (val) => updateLimit(val)
-})
+});
 </script>
+
 <template>
     <div class="container mx-auto px-4 py-8">
         <!-- Page Title and Limit Selector -->
@@ -44,9 +42,11 @@ const limitModel = computed({
             </aside>
 
             <!-- Products Content -->
-            <div class="flex-1">
-                <!-- Loading State -->
-                <LoadingState v-if="pending" message="Loading products..." />
+            <div class="flex-1 min-h-[400px]">
+                <!-- Loading State with Skeleton -->
+                <div v-if="pending" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <ProductCardSkeleton v-for="n in limit" :key="`skeleton-${n}`" />
+                </div>
 
                 <!-- Error State -->
                 <div v-else-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">

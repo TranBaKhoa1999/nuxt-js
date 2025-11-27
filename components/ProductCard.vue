@@ -4,13 +4,6 @@ import type { Product } from '~/types/product';
 const props = defineProps<{ product: Product }>();
 
 const isHovering = ref(false);
-
-const handleImageError = (e: Event) => {
-    const target = e.target as HTMLImageElement
-    if (target) {
-        target.src = 'https://via.placeholder.com/400x300?text=No+Image'
-    }
-}
 </script>
 
 <template>

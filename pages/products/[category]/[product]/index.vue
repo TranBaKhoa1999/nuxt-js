@@ -7,23 +7,17 @@ const categorySlug = computed(() => route.params.category as string);
 const productSlug = computed(() => route.params.product as string);
 
 const pageKey = computed(() => `product:${categorySlug.value}:${productSlug.value}`);
+const apiUrl = computed(() => `products/${categorySlug.value}/${productSlug.value}`);
 const { apiFetch } = useApi();
 
 const { data, pending, error, refresh } = await useAsyncData(pageKey, async () => {
-    const response = await apiFetch<{ data?: Product }>(`products/${categorySlug.value}/${productSlug.value}`);
+    const response = await apiFetch<{ data?: Product }>(apiUrl.value);
     return response.data ?? response as unknown as Product;
 }, {
     default: () => null
 });
 
 const product = computed(() => data.value);
-
-const fallbackImage = 'https://via.placeholder.com/800x600?text=No+Image';
-
-const handleImageError = (event: Event) => {
-    const target = event.target as HTMLImageElement;
-    if (target) target.src = fallbackImage;
-};
 
 const goBack = () => router.back();
 
@@ -65,8 +59,8 @@ useHead({
         <div v-else-if="product" class="grid gap-8 lg:grid-cols-2">
             <div class="rounded-2xl bg-white p-4 shadow dark:bg-gray-900">
                 <div class="relative overflow-hidden rounded-xl bg-gray-50 dark:bg-gray-800">
-                    <img :src="product.image_url || fallbackImage" :alt="product.name"
-                        class="h-full w-full max-h-[480px] object-contain" @error="handleImageError" />
+                    <img :src="product.image_url" :alt="product.name" class="h-full w-full max-h-[480px] object-contain"
+                        @error="handleImageError" />
                 </div>
             </div>
 

@@ -44,8 +44,7 @@ const limitModel = computed({
             <!-- Products Content -->
             <div class="flex-1 min-h-[400px]">
                 <!-- Loading State with Skeleton -->
-                <div v-if="pending"
-                    class="grid gap-6 grid-cols-[repeat(auto-fit,_minmax(220px,1fr))]">
+                <div v-if="pending" class="grid gap-6 grid-cols-[repeat(auto-fit,_minmax(220px,1fr))]">
                     <ProductCardSkeleton v-for="n in limit" :key="`skeleton-${n}`" />
                 </div>
 

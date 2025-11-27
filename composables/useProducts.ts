@@ -14,25 +14,21 @@ export const useProducts = async (options: UseProductsOptions = {}) => {
     const { page: optPage, limit: optLimit, ttl = 1000 * 60 * 30 } = options
 
     const route = useRoute();
-    const router = useRouter();
     const { apiFetch } = useApi();
     const { set, read } = useGlobalCache();
 
-    // Save page and limit in state (not displayed in URL)
-    // Read from query params on first load (to support share URL), then use state
+    // Initial page/limit only from options or defaults (no query params)
     const initialPage = (() => {
-        const val = route.query.page ?? optPage ?? 1
-        const n = Number(val)
+        const n = Number(optPage ?? 1);
         return Number.isNaN(n) || n < 1 ? 1 : n;
-    })()
+    })();
 
     const initialLimit = (() => {
-        if (optLimit !== undefined) return optLimit > 0 ? optLimit : 5;
-        const val = route.query.limit
-        if (!val) return DEFAULT_SHOW_ITEM_PER_PAGE;
-        const n = Number(val);
-        return Number.isNaN(n) || n < 1 ? 5 : n;
-    })()
+        if (optLimit !== undefined) {
+            return optLimit > 0 ? optLimit : DEFAULT_SHOW_ITEM_PER_PAGE;
+        }
+        return DEFAULT_SHOW_ITEM_PER_PAGE;
+    })();
 
     // State to store page and limit (not displayed in URL)
     const pageState = useState('products-page', () => initialPage)
@@ -113,19 +109,8 @@ export const useProducts = async (options: UseProductsOptions = {}) => {
     const goToPage = (targetPage: number) => {
         if (targetPage === page.value) return
 
-        // Only update state, don't update URL
+        // Only update state
         page.value = targetPage
-
-        // Navigate without query params
-        if (category.value) {
-            router.replace({
-                path: `/products/${category.value}`
-            })
-        } else {
-            router.replace({
-                path: '/products'
-            })
-        }
     }
 
     const updateLimit = (newLimit?: number) => {
@@ -134,17 +119,6 @@ export const useProducts = async (options: UseProductsOptions = {}) => {
         // Update both page and limit in state
         limit.value = newLimitValue
         page.value = 1 // Reset to page 1
-
-        // Navigate without query params
-        if (category.value) {
-            router.replace({
-                path: `/products/${category.value}`
-            })
-        } else {
-            router.replace({
-                path: '/products'
-            })
-        }
     }
 
 

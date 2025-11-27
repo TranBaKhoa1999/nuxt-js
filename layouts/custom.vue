@@ -4,6 +4,9 @@
     </div>
     <!-- <Header /> -->
     <slot />
+    <div>
+        Custom footer
+    </div>
     <!-- <Footer /> -->
 </template>
 

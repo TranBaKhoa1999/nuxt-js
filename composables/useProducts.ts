@@ -2,6 +2,7 @@
 import { computed, watch } from 'vue'
 import type { ProductsResponse } from '~/types/product'
 import { useGlobalCache } from './useCache'
+import { DEFAULT_SHOW_ITEM_PER_PAGE } from '~/constants'
 
 interface UseProductsOptions {
     page?: number
@@ -28,7 +29,7 @@ export const useProducts = async (options: UseProductsOptions = {}) => {
     const initialLimit = (() => {
         if (optLimit !== undefined) return optLimit > 0 ? optLimit : 5;
         const val = route.query.limit
-        if (!val) return 5;
+        if (!val) return DEFAULT_SHOW_ITEM_PER_PAGE;
         const n = Number(val);
         return Number.isNaN(n) || n < 1 ? 5 : n;
     })()
@@ -128,7 +129,7 @@ export const useProducts = async (options: UseProductsOptions = {}) => {
     }
 
     const updateLimit = (newLimit?: number) => {
-        const newLimitValue = newLimit && newLimit > 0 ? newLimit : 5
+        const newLimitValue = newLimit && newLimit > 0 ? newLimit : DEFAULT_SHOW_ITEM_PER_PAGE
 
         // Update both page and limit in state
         limit.value = newLimitValue

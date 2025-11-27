@@ -2,7 +2,7 @@
 
 const { products, meta, pending, error, goToPage, updateLimit, limit } = await useProducts();
 
-const limitOptions = [5, 10, 20, 50, 100];
+const limitOptions = [10, 20, 50, 100];
 
 // Limit model cho select
 const limitModel = computed({
@@ -44,7 +44,8 @@ const limitModel = computed({
             <!-- Products Content -->
             <div class="flex-1 min-h-[400px]">
                 <!-- Loading State with Skeleton -->
-                <div v-if="pending" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div v-if="pending"
+                    class="grid gap-6 grid-cols-[repeat(auto-fit,_minmax(220px,1fr))]">
                     <ProductCardSkeleton v-for="n in limit" :key="`skeleton-${n}`" />
                 </div>
 
@@ -56,7 +57,7 @@ const limitModel = computed({
 
                 <!-- Products Grid -->
                 <div v-else-if="products && products.length > 0"
-                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    class="grid gap-6 grid-cols-[repeat(auto-fit,_minmax(220px,1fr))]">
                     <ProductCard v-for="product in products" :key="product.id" :product="product" />
                 </div>
 

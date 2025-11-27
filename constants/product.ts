@@ -1,0 +1,1 @@
+export const DEFAULT_SHOW_ITEM_PER_PAGE = 10;

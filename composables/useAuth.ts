@@ -72,7 +72,7 @@ export const useAuth = (options: UseAuthOptions = {}) => {
     }
 
     const logout = async () => {
-        await request<AuthResponse>('auth/logout')
+        await request<AuthResponse>('api/logout')
         setUser(null)
         await router.push(redirectOnLogout)
     }

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { Product } from '~/types/product';
 
-const props = defineProps<{ product: Product }>()
+const props = defineProps<{ product: Product }>();
+
+const isHovering = ref(false);
 
 const handleImageError = (e: Event) => {
     const target = e.target as HTMLImageElement
@@ -13,12 +15,21 @@ const handleImageError = (e: Event) => {
 
 <template>
     <div
-        class="bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow">
+        class="bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow relative">
         <!-- Product Image -->
-        <NuxtLink :to="`/products/${props.product.category.slug}/${props.product.slug}`">
-            <img class="rounded-t-lg w-full h-40 object-cover" :src="props.product.image_url" :alt="props.product.name"
-                @error="handleImageError" />
-        </NuxtLink>
+        <div class="relative">
+            <NuxtLink :to="`/products/${props.product.category.slug}/${props.product.slug}`">
+                <img class="rounded-t-lg w-full h-40 object-contain" :src="props.product.image_url"
+                    :alt="props.product.name" @error="handleImageError" @mouseenter="isHovering = true"
+                    @mouseleave="isHovering = false" />
+            </NuxtLink>
+            <!-- Product Preview on Hover -->
+            <Transition name="fade">
+                <div v-if="isHovering" class="absolute top-full left-0 z-50 mt-2 w-80">
+                    <ProductPreview :product="props.product" />
+                </div>
+            </Transition>
+        </div>
 
         <div class="p-3">
             <!-- Category Badge -->
@@ -92,5 +103,15 @@ const handleImageError = (e: Event) => {
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>

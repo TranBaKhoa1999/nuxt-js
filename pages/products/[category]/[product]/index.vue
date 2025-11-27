@@ -22,7 +22,7 @@ const product = computed(() => data.value);
 const goBack = () => router.back();
 
 useHead({
-    title: product.value ? `${product.value.name} | Flowbite Shop` : 'Product Detail'
+    title: product.value ? product.value.name : 'Product Detail'
 });
 </script>
 

@@ -14,10 +14,10 @@
                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                             Login
                         </NuxtLink>
-                        <NuxtLink to="/register"
+                        <!-- <NuxtLink to="/register"
                             class="text-sm font-medium px-4 py-2 rounded-lg text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-300 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-400 dark:hover:text-gray-900">
                             Register
-                        </NuxtLink>
+                        </NuxtLink> -->
                     </template>
                     <template v-else>
                         <span class="text-sm font-semibold text-gray-700 dark:text-gray-200 mr-2">

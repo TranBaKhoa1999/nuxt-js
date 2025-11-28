@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { DEFAULT_SHOW_ITEM_PER_PAGE_OPTIONS } from '~/constants';
 
 const { products, meta, pending, error, goToPage, updateLimit, limit } = await useProducts();
 
-const limitOptions = [10, 20, 50, 100];
+const limitOptions = DEFAULT_SHOW_ITEM_PER_PAGE_OPTIONS;
 
 // Limit model cho select
 const limitModel = computed({

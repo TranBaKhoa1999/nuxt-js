@@ -30,6 +30,7 @@ iwr https://get.pnpm.io/install.ps1 -useb | iex
 ```bash
 git clone <repository-url>
 cd nuxt-js
+git checkout develop
 ```
 
 ### 2. Cài Đặt Dependencies
